@@ -5,7 +5,7 @@ import 'package:json_parse_lab/models/images.dart';
 import 'package:json_parse_lab/models/powerstats.dart';
 import 'package:json_parse_lab/models/work.dart';
 
-class Hero {
+class MyHero {
   int? id;
   String? name;
   String? slug;
@@ -16,7 +16,7 @@ class Hero {
   Connections? connections;
   Images? images;
 
-  Hero(
+  MyHero(
       {this.id,
         this.name,
         this.slug,
@@ -27,7 +27,7 @@ class Hero {
         this.connections,
         this.images});
 
-  Hero.fromJson(Map<String, dynamic> json) {
+  MyHero.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
     slug = json['slug'];
@@ -72,5 +72,10 @@ class Hero {
       data['images'] = this.images!.toJson();
     }
     return data;
+  }
+
+  @override
+  String toString() {
+    return 'Hero{id: $id, name: $name, images: $images}';
   }
 }

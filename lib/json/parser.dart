@@ -6,18 +6,23 @@ import 'dart:convert';
 class JsonParser {
   final String baseUrl = 'https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/';
 
-  Future<List<Hero>> getAllHeroes() async {
-    List<Hero> heroes = [];
+  final _heroesController = StreamController<List<MyHero>>();
+  List<MyHero> heroes = [];
+
+  Stream<List<MyHero>> get heroesStream => _heroesController.stream;
+
+  Future<List<MyHero>> fetchAllHeroes() async {
+    List<MyHero> heroes = [];
     String url = '${baseUrl}all.json';
     var response = await http.get(Uri.parse(url));
-    print(response.body);
+    //print(response.body);
 
     if(response.statusCode == 200) {
       var data = json.decode(response.body);
-      var rest = data['heroes'];
+      //print(data);
       //print(rest);
 
-      heroes = rest.map<Hero>((json) => Hero.fromJson(json)).toList();
+      heroes = data.map<MyHero>((json) => MyHero.fromJson(json)).toList();
     }
     return heroes;
   }
