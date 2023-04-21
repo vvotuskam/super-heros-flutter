@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:json_parse_lab/models/hero.dart';
 import 'package:http/http.dart' as http;
+import 'package:json_parse_lab/screens/about.dart';
+import 'package:json_parse_lab/screens/favourite_list.dart';
 import 'dart:async';
 import 'dart:convert';
+
+import 'package:json_parse_lab/screens/heroes_grid.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +21,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.red,
       ),
       home: const MyHomePage(),
     );
@@ -46,60 +50,58 @@ class _MyHomePageState extends State<MyHomePage> {
     return heroes;
   }
 
-  Widget listViewWidget(List<MyHero> heroes) {
-    return Container(
-      child: ListView.builder(
-          itemCount: 20,
-          padding: const EdgeInsets.all(2.0),
-          itemBuilder: (context, position) {
-            return Card(
-              child: ListTile(
-                title: Text(
-                  '${heroes[position].name}',
-                  style: TextStyle(
-                      fontSize: 18.0,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold),
-                ),
-                leading: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SizedBox(
-                    child: heroes[position].images == null
-                        ? Image(
-                      image: AssetImage('images/no_image_available.png'),
-                    )
-                        : Image.network('${heroes[position].images?.md}'),
-                    height: 100.0,
-                    width: 100.0,
-                  ),
-                ),
-                onTap: null,
-              ),
-            );
-          }),
-    );
-  }
+  List<Widget> _pages = [];
+  int _selectedIndex = 0;
+  List<MyHero> _favorites = [];
 
   @override
   void initState() {
-    super.initState();
-    fetchAllHeroes();
+    _pages = [
+      HeroesList(heroes: fetchAllHeroes(), onToggleFavorite: _toggleFavorite, containsFavorite: containsFavorite),
+      FavoriteList(favourites: _favorites, onToggleFavorite: _toggleFavorite, containsFavorite: containsFavorite),
+      AboutPage(),
+    ];
+    _selectedIndex = 0;
+  }
+
+  void _toggleFavorite(MyHero hero) {
+    if (_favorites.contains(hero)) {
+      _favorites.remove(hero);
+    } else {
+      _favorites.add(hero);
+    }
+  }
+
+  bool containsFavorite(MyHero hero) {
+    return _favorites.contains(hero);
+  }
+
+  void _navigate(int value) {
+    setState(() {
+      _selectedIndex = value;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        title: const Text("HEROES"),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primaryColor: Colors.red
       ),
-      body: FutureBuilder(
-          future: fetchAllHeroes(),
-          builder: (context, snapshot) {
-            return snapshot.data != null
-                ? listViewWidget(snapshot.data!)
-                : Center(child: CircularProgressIndicator());
-          }),
+        home: Scaffold(
+          body: _pages[_selectedIndex],
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: _selectedIndex,
+            onTap: _navigate,
+            type: BottomNavigationBarType.fixed,
+            items: const [
+              BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+              BottomNavigationBarItem(icon: Icon(Icons.star), label: 'Favourites'),
+              BottomNavigationBarItem(icon: Icon(Icons.info), label: 'About'),
+            ],
+          ),
+        )
     );
   }
 

@@ -33,4 +33,9 @@ class Appearance {
     data['hairColor'] = this.hairColor;
     return data;
   }
+
+  @override
+  String toString() {
+    return 'gender: $gender\nrace: $race\nheight: ${height?[0] ?? 'Unknown'}\nweight: ${weight?[0] ?? 'Unknown'}';
+  }
 }

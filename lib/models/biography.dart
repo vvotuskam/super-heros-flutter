@@ -37,4 +37,9 @@ class Biography {
     data['alignment'] = this.alignment;
     return data;
   }
+
+  @override
+  String toString() {
+    return 'place of birth: $placeOfBirth\nfirst appearance: $firstAppearance';
+  }
 }

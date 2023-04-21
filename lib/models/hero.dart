@@ -32,10 +32,10 @@ class MyHero {
     name = json['name'];
     slug = json['slug'];
     powerstats = json['powerstats'] != null
-        ? new Powerstats.fromJson(json['powerstats'])
+        ? Powerstats.fromJson(json['powerstats'])
         : null;
     appearance = json['appearance'] != null
-        ? new Appearance.fromJson(json['appearance'])
+        ? Appearance.fromJson(json['appearance'])
         : null;
     biography = json['biography'] != null
         ? new Biography.fromJson(json['biography'])
