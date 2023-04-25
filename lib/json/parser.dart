@@ -26,6 +26,20 @@ class JsonParser {
     }
     return heroes;
   }
+
+  Future<MyHero> fetchHero(int id) async {
+    MyHero hero = MyHero();
+
+    String url = '$baseUrl/id/$id.json';
+    var response = await http.get(Uri.parse(url));
+
+    if(response.statusCode == 200) {
+      var data = json.decode(response.body);
+      hero = data.map<MyHero>((json) => MyHero.fromJson(json));
+    }
+
+    return hero;
+  }
 }
 
 /*

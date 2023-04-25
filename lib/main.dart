@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:json_parse_lab/json/parser.dart';
+import 'package:json_parse_lab/json/preferences_manager.dart';
 import 'package:json_parse_lab/models/hero.dart';
 import 'package:http/http.dart' as http;
 import 'package:json_parse_lab/screens/about.dart';
@@ -52,28 +54,29 @@ class _MyHomePageState extends State<MyHomePage> {
 
   List<Widget> _pages = [];
   int _selectedIndex = 0;
-  List<MyHero> _favorites = [];
+  JsonParser jsonParser = JsonParser();
+  PreferencesManager prefManager = PreferencesManager();
 
   @override
   void initState() {
     _pages = [
       HeroesList(heroes: fetchAllHeroes(), onToggleFavorite: _toggleFavorite, containsFavorite: containsFavorite),
-      FavoriteList(favourites: _favorites, onToggleFavorite: _toggleFavorite, containsFavorite: containsFavorite),
+      FavoriteList(favourites: prefManager.getAll(), onToggleFavorite: _toggleFavorite, containsFavorite: containsFavorite),
       AboutPage(),
     ];
     _selectedIndex = 0;
   }
 
-  void _toggleFavorite(MyHero hero) {
-    if (_favorites.contains(hero)) {
-      _favorites.remove(hero);
+  void _toggleFavorite(MyHero hero) async {
+    if (await containsFavorite(hero)) {
+      prefManager.removeFavourite(hero.id!);
     } else {
-      _favorites.add(hero);
+      prefManager.addFavourite(hero.id!);
     }
   }
 
-  bool containsFavorite(MyHero hero) {
-    return _favorites.contains(hero);
+  Future<bool> containsFavorite(MyHero hero) {
+    return prefManager.containsFavourite(hero);
   }
 
   void _navigate(int value) {

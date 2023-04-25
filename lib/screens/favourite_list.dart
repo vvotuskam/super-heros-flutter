@@ -5,7 +5,7 @@ import 'hero_info.dart';
 
 class FavoriteList extends StatefulWidget {
   FavoriteList({required this.favourites, required this.onToggleFavorite, required this.containsFavorite});
-  List<MyHero> favourites;
+  Future<List<MyHero>> favourites;
   Function(MyHero hero) onToggleFavorite;
   Function(MyHero hero) containsFavorite;
 
@@ -106,7 +106,13 @@ class _FavoriteListState extends State<FavoriteList> {
           centerTitle: true,
           elevation: 0,
         ),
-        body: listViewWidget(widget.favourites),
+        body: FutureBuilder(
+            future: widget.favourites,
+            builder: (context, snapshot) {
+              return snapshot.data != null
+                  ? listViewWidget(snapshot.data!)
+                  : const Center(child: CircularProgressIndicator());
+            }),
       )
     );
   }

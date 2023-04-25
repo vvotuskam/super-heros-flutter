@@ -94,8 +94,8 @@ class _HeroesListState extends State<HeroesList> {
             ),
             IconButton(
               onPressed: () {
-                setState(() {
-                  widget.onToggleFavorite(hero);
+                 setState(() async {
+                   await widget.onToggleFavorite(hero);
                 });
               },
               icon: Icon(
