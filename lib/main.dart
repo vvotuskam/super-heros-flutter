@@ -11,13 +11,13 @@ import 'dart:convert';
 import 'package:json_parse_lab/screens/heroes_grid.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -55,28 +55,32 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Widget> _pages = [];
   int _selectedIndex = 0;
   JsonParser jsonParser = JsonParser();
+  List<MyHero> favourites = [];
   PreferencesManager prefManager = PreferencesManager();
 
   @override
   void initState() {
+
+    prefManager.initFavourites();
+
     _pages = [
       HeroesList(heroes: fetchAllHeroes(), onToggleFavorite: _toggleFavorite, containsFavorite: containsFavorite),
       FavoriteList(favourites: prefManager.getAll(), onToggleFavorite: _toggleFavorite, containsFavorite: containsFavorite),
-      AboutPage(),
+      const AboutPage(),
     ];
     _selectedIndex = 0;
   }
 
-  void _toggleFavorite(MyHero hero) async {
-    if (await containsFavorite(hero)) {
-      prefManager.removeFavourite(hero.id!);
-    } else {
-      prefManager.addFavourite(hero.id!);
-    }
+  void _toggleFavorite(MyHero hero) {
+    setState(() {
+      prefManager.addRemoveFavourite(hero.id!);
+    });
   }
 
-  Future<bool> containsFavorite(MyHero hero) {
-    return prefManager.containsFavourite(hero);
+  bool containsFavorite(MyHero hero) {
+    bool contains = prefManager.containsFavourite(hero) == Future.value(true);
+    print('${hero.name} contains $contains');
+    return contains;
   }
 
   void _navigate(int value) {
@@ -84,6 +88,8 @@ class _MyHomePageState extends State<MyHomePage> {
       _selectedIndex = value;
     });
   }
+
+
 
   @override
   Widget build(BuildContext context) {

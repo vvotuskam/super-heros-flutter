@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:json_parse_lab/json/preferences_manager.dart';
 
 import '../models/hero.dart';
 import 'hero_info.dart';
@@ -23,6 +24,7 @@ class _FavoriteListState extends State<FavoriteList> {
 
   Widget customCard(MyHero hero) {
     String race = hero.appearance?.race ?? "Unknown";
+    PreferencesManager prefManager = PreferencesManager();
     return InkWell(
       onTap: () {
         Navigator.push(
@@ -72,13 +74,19 @@ class _FavoriteListState extends State<FavoriteList> {
                   widget.onToggleFavorite(hero);
                 });
               },
-              icon: Icon(
-                widget.containsFavorite(hero)
-                    ? Icons.star
-                    : Icons.star_border,
-                color: widget.containsFavorite(hero)
-                    ? Colors.red
-                    : null,
+              icon: FutureBuilder(
+                future: prefManager.containsFavourite(hero),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Icon(Icons.star_border,);
+                  } else if (snapshot.hasError) {
+                    return const Icon(Icons.star_border);
+                  } else if (snapshot.data!) {
+                    return const Icon(Icons.star, color: Colors.red,);
+                  } else {
+                    return const Icon(Icons.star_border);
+                  }
+                },
               ),
             ),
           ],
@@ -96,8 +104,17 @@ class _FavoriteListState extends State<FavoriteList> {
         });
   }
 
+
+  @override
+  void initState() {
+
+  }
+
   @override
   Widget build(BuildContext context) {
+    PreferencesManager prefsManager = PreferencesManager();
+    widget.favourites = prefsManager.getAll();
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -109,6 +126,7 @@ class _FavoriteListState extends State<FavoriteList> {
         body: FutureBuilder(
             future: widget.favourites,
             builder: (context, snapshot) {
+              print(snapshot.data.toString());
               return snapshot.data != null
                   ? listViewWidget(snapshot.data!)
                   : const Center(child: CircularProgressIndicator());

@@ -40,13 +40,13 @@ class _AboutPageState extends State<AboutPage> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            // const SizedBox(height: 16.0),
-            // Row(
-            //   mainAxisAlignment: MainAxisAlignment.center,
-            //   children: [
-            //     Image.asset('assets/img.jpeg', height: 350,),
-            //   ],
-            // ),
+            const SizedBox(height: 16.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset('assets/img.jpeg', height: 350,),
+              ],
+            ),
             const SizedBox(height: 20,),
             const Text(
               'Description:',

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:json_parse_lab/json/preferences_manager.dart';
 import 'package:json_parse_lab/screens/hero_info.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -19,10 +20,35 @@ class HeroesList extends StatefulWidget {
 
 class _HeroesListState extends State<HeroesList> {
 
+  PreferencesManager prefManager = PreferencesManager();
+
   void refresh() {
     setState(() {
 
     });
+  }
+
+  bool contains(MyHero hero) {
+
+    prefManager.getAll()
+    .then((value) => value.toList())
+    .then((list) {
+      for (var i in list) {
+        if (i.id! == hero.id!) {
+          return true;
+        }
+      }
+    });
+
+    return false;
+  }
+
+  Icon getIcon(MyHero hero) {
+    bool favContains = widget.containsFavorite(hero);
+    final icon = favContains ? Icons.star : Icons.star_border;
+    final color = favContains ? Colors.blue : null;
+
+    return Icon(icon, color: color,);
   }
 
   Future<List<MyHero>> fetchAllHeroes() async {
@@ -94,17 +120,23 @@ class _HeroesListState extends State<HeroesList> {
             ),
             IconButton(
               onPressed: () {
-                 setState(() async {
-                   await widget.onToggleFavorite(hero);
+                setState(() {
+                  widget.onToggleFavorite(hero);
                 });
               },
-              icon: Icon(
-                widget.containsFavorite(hero)
-                    ? Icons.star
-                    : Icons.star_border,
-                color: widget.containsFavorite(hero)
-                    ? Colors.red
-                    : null,
+              icon: FutureBuilder(
+                future: prefManager.containsFavourite(hero),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Icon(Icons.star_border);
+                  } else if (snapshot.hasError) {
+                    return const Icon(Icons.star_border);
+                  } else if (snapshot.data!) {
+                    return const Icon(Icons.star, color: Colors.red);
+                  } else {
+                    return const Icon(Icons.star_border);
+                  }
+                },
               ),
             ),
           ],
@@ -131,6 +163,7 @@ class _HeroesListState extends State<HeroesList> {
         body: FutureBuilder(
             future: widget.heroes,
             builder: (context, snapshot) {
+
               return snapshot.data != null
                   ? listViewWidget(snapshot.data!)
                   : const Center(child: CircularProgressIndicator());

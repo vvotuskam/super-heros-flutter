@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:json_parse_lab/json/preferences_manager.dart';
 import 'package:json_parse_lab/models/hero.dart';
 
 class HeroInfo extends StatefulWidget {
@@ -76,6 +77,8 @@ class HeroInfo extends StatefulWidget {
 // }
 
 class _HeroInfoState extends State<HeroInfo> {
+
+  PreferencesManager prefManager = PreferencesManager();
 
   @override
   Widget build(BuildContext context) {
@@ -154,11 +157,20 @@ class _HeroInfoState extends State<HeroInfo> {
             widget.notify();
           });
         },
-        child: Icon(
-          widget.containsFavorite(hero)
-            ? Icons.star
-            : Icons.star_border,
-          ),
+        child: FutureBuilder(
+          future: prefManager.containsFavourite(hero),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Icon(Icons.star_border);
+            } else if (snapshot.hasError) {
+              return const Icon(Icons.star_border);
+            } else if (snapshot.data!) {
+              return const Icon(Icons.star);
+            } else {
+              return const Icon(Icons.star_border);
+            }
+          },
+        ),
       ),
     );
   }
